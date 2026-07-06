@@ -118,6 +118,75 @@ document.addEventListener('DOMContentLoaded', async function() {
     template = template.replace(/\s+integrity="[^"]*"/gi, '').replace(/\s+crossorigin="[^"]*"/gi, '');
 
     const responsivePatch = String.raw`<style id="fh-hugm-responsive">
+      #plan-root > div:first-child { padding-right: 220px !important; }
+      #fh-ux-toolbar {
+        position: fixed;
+        top: 7px;
+        right: 18px;
+        z-index: 90;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      #fh-ux-toolbar button {
+        min-height: 28px;
+        border: 1px solid #CFC9B8;
+        border-radius: 999px;
+        background: rgba(242, 238, 225, 0.92);
+        color: #1A1A1A;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        line-height: 1;
+        padding: 7px 11px;
+      }
+      #fh-ux-toolbar button:hover { border-color: #8F1117; color: #8F1117; }
+      #fh-ux-toolbar button[aria-pressed="true"] { background: #1A1A1A; border-color: #1A1A1A; color: #F2EEE1; }
+      body.fh-dark, body.fh-dark #plan-root { background: #11100E !important; color: #F6EFE4 !important; }
+      body.fh-dark #plan-root main,
+      body.fh-dark #plan-root nav,
+      body.fh-dark #plan-root section,
+      body.fh-dark #plan-root footer,
+      body.fh-dark #plan-root > div:first-child { background: #11100E !important; color: #F6EFE4 !important; border-color: #3B352D !important; }
+      body.fh-dark #plan-root [style*="background:#F2EEE1"],
+      body.fh-dark #plan-root [style*="background: #F2EEE1"],
+      body.fh-dark #plan-root [style*="background: rgb(242, 238, 225)"],
+      body.fh-dark #plan-root [style*="background:#EFEBDC"],
+      body.fh-dark #plan-root [style*="background: #EFEBDC"],
+      body.fh-dark #plan-root [style*="background: rgb(239, 235, 220)"] { background: #191713 !important; }
+      body.fh-dark #plan-root [style*="background:#1A1A1A"],
+      body.fh-dark #plan-root [style*="background: #1A1A1A"],
+      body.fh-dark #plan-root [style*="background: rgb(26, 26, 26)"] { background: #F6EFE4 !important; color: #11100E !important; }
+      body.fh-dark #plan-root [style*="color:#1A1A1A"],
+      body.fh-dark #plan-root [style*="color: #1A1A1A"],
+      body.fh-dark #plan-root [style*="color: rgb(26, 26, 26)"],
+      body.fh-dark #plan-root [style*="color:#3A372F"],
+      body.fh-dark #plan-root [style*="color: #3A372F"],
+      body.fh-dark #plan-root [style*="color: rgb(58, 55, 47)"] { color: #F6EFE4 !important; }
+      body.fh-dark #plan-root [style*="color:#8A8579"],
+      body.fh-dark #plan-root [style*="color: #8A8579"],
+      body.fh-dark #plan-root [style*="color: rgb(138, 133, 121)"],
+      body.fh-dark #plan-root [style*="color:#B5AF9E"],
+      body.fh-dark #plan-root [style*="color: #B5AF9E"],
+      body.fh-dark #plan-root [style*="color: rgb(181, 175, 158)"] { color: #BDB5A6 !important; }
+      body.fh-dark #plan-root [style*="color:#8F1117"],
+      body.fh-dark #plan-root [style*="color: #8F1117"],
+      body.fh-dark #plan-root [style*="color: rgb(143, 17, 23)"] { color: #FF8D94 !important; }
+      body.fh-dark #plan-root [style*="border"] { border-color: #3B352D !important; }
+      body.fh-dark #plan-root input { background: #191713 !important; color: #F6EFE4 !important; border-color: #3B352D !important; }
+      body.fh-dark #plan-root a[href$=".pdf"],
+      body.fh-dark #plan-root [style*="background:#8F1117"],
+      body.fh-dark #plan-root [style*="background: #8F1117"],
+      body.fh-dark #plan-root [style*="background: rgb(143, 17, 23)"] { background: #A91F27 !important; border-color: #A91F27 !important; color: #FFF7EA !important; }
+      body.fh-dark #plan-root svg [stroke="#1A1A1A"] { stroke: #F6EFE4 !important; }
+      body.fh-dark #plan-root svg [fill="#1A1A1A"] { fill: #F6EFE4 !important; }
+      body.fh-dark #plan-root svg text { fill: #D8D0C0 !important; }
+      body.fh-dark #fh-ux-toolbar button { background: rgba(17, 16, 14, 0.92); border-color: #4A4238; color: #F6EFE4; }
+      body.fh-dark #fh-ux-toolbar button:hover { border-color: #FF8D94; color: #FF8D94; }
+      body.fh-dark #fh-ux-toolbar button[aria-pressed="true"] { background: #F6EFE4; border-color: #F6EFE4; color: #11100E; }
       @media (max-width: 1080px) {
         html, body, #plan-root { width: 100% !important; max-width: 100% !important; overflow-x: hidden !important; }
         #plan-root, #plan-root * { box-sizing: border-box !important; }
@@ -147,10 +216,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         #plan-root #sec-inicio p { max-width: 100% !important; font-size: 17px !important; }
         #plan-root #sec-inicio [style*="margin-top:42px"], #plan-root #sec-inicio [style*="margin-top: 42px"] { margin-top: 28px !important; }
         #plan-root #sec-inicio a[href$=".pdf"] { position: fixed !important; top: 8px !important; right: 14px !important; width: auto !important; z-index: 80 !important; justify-content: center !important; padding: 6px 11px !important; box-shadow: 0 6px 16px rgba(143, 17, 23, 0.18) !important; }
+        #fh-ux-toolbar { left: 10px !important; right: auto !important; top: 7px !important; gap: 5px !important; }
+        #fh-ux-toolbar button { min-height: 28px !important; padding: 6px 8px !important; font-size: 9px !important; }
         #plan-root > div:first-child { height: 42px !important; justify-content: flex-start !important; padding-left: 14px !important; padding-right: 104px !important; }
         #plan-root > div:first-child > div { display: none !important; }
         #plan-root > div:first-child > #progressbar { display: block !important; }
-        #plan-root > div:first-child > div:nth-child(2) { display: block !important; max-width: calc(100vw - 122px) !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+        #plan-root > div:first-child > div:nth-child(2) { display: none !important; max-width: calc(100vw - 122px) !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
         #plan-root > div[style*="position:fixed; right:24px; bottom:24px"], #plan-root > div[style*="position: fixed"][style*="right: 24px"][style*="bottom: 24px"] { display: none !important; }
         #plan-root h1 { font-size: clamp(34px, 10vw, 44px) !important; }
         #plan-root h2 { font-size: clamp(28px, 8vw, 36px) !important; }
@@ -160,6 +231,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         #plan-root #sec-inicio > div > div:first-child { grid-template-columns: minmax(0, 1fr) minmax(220px, 280px) !important; gap: 32px !important; align-items: center !important; }
         #plan-root [style*="grid-template-columns:repeat(3,1fr)"], #plan-root [style*="grid-template-columns: repeat(3, 1fr)"], #plan-root [style*="grid-template-columns:repeat(4,1fr)"], #plan-root [style*="grid-template-columns: repeat(4, 1fr)"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         #plan-root #sec-inicio a[href$=".pdf"] { position: fixed !important; top: 8px !important; right: 18px !important; z-index: 80 !important; padding: 6px 12px !important; box-shadow: 0 6px 16px rgba(143, 17, 23, 0.18) !important; }
+        #fh-ux-toolbar { left: 50% !important; right: auto !important; transform: translateX(-50%) !important; }
         #plan-root > div[style*="position:fixed; right:24px; bottom:24px"], #plan-root > div[style*="position: fixed"][style*="right: 24px"][style*="bottom: 24px"] { display: none !important; }
         #plan-root > div:first-child { justify-content: flex-start !important; padding-left: 20px !important; padding-right: 150px !important; }
         #plan-root > div:first-child > div { display: none !important; }
@@ -175,6 +247,110 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     </style>`;
     template = template.replace(/<\/head>/i, responsivePatch + '</head>');
+
+    function installReaderControls() {
+      const root = document.getElementById('plan-root');
+      if (!root) {
+        window.setTimeout(installReaderControls, 120);
+        return;
+      }
+
+      let toolbar = document.getElementById('fh-ux-toolbar');
+      if (!toolbar) {
+        toolbar = document.createElement('div');
+        toolbar.id = 'fh-ux-toolbar';
+        toolbar.setAttribute('aria-label', 'Controles de lectura');
+        toolbar.innerHTML =
+          '<button type="button" data-fh-font aria-label="Aumentar tamano de letra" title="Aumentar tamano de letra">A+</button>' +
+          '<button type="button" data-fh-theme aria-label="Cambiar entre modo claro y oscuro" title="Cambiar entre modo claro y oscuro">OSCURO</button>';
+        document.body.appendChild(toolbar);
+      } else if (toolbar.parentElement !== document.body) {
+        document.body.appendChild(toolbar);
+      }
+      const fontBtn = toolbar.querySelector('[data-fh-font]');
+      const themeBtn = toolbar.querySelector('[data-fh-theme]');
+      const fontLevels = [1, 1.12, 1.24];
+
+      function readStoredInt(key, fallback) {
+        try {
+          const value = parseInt(localStorage.getItem(key) || '', 10);
+          return Number.isFinite(value) ? value : fallback;
+        } catch (e) {
+          return fallback;
+        }
+      }
+
+      function storeValue(key, value) {
+        try { localStorage.setItem(key, String(value)); } catch (e) {}
+      }
+
+      function applyFontLevel(level) {
+        const normalized = Math.max(0, Math.min(fontLevels.length - 1, level));
+        const scale = fontLevels[normalized];
+        root.dataset.fhFontLevel = String(normalized);
+        if (fontBtn) {
+          fontBtn.setAttribute('aria-pressed', normalized > 0 ? 'true' : 'false');
+          fontBtn.title = normalized === 0 ? 'Aumentar tamano de letra' : (normalized === 1 ? 'Letra grande activa' : 'Letra muy grande activa');
+        }
+
+        root.querySelectorAll('main *, nav *, footer *').forEach(el => {
+          if (el.closest('#fh-ux-toolbar')) return;
+          if (!(el instanceof HTMLElement)) return;
+          const computed = window.getComputedStyle(el);
+          const current = parseFloat(computed.fontSize);
+          if (!Number.isFinite(current) || current < 8 || current > 96) return;
+          if (!el.dataset.fhBaseFontSize) el.dataset.fhBaseFontSize = String(current);
+          const base = parseFloat(el.dataset.fhBaseFontSize);
+          if (!Number.isFinite(base)) return;
+          el.style.setProperty('font-size', (base * scale).toFixed(2) + 'px', 'important');
+        });
+      }
+
+      function applyTheme(dark) {
+        document.body.classList.toggle('fh-dark', dark);
+        root.dataset.fhTheme = dark ? 'dark' : 'light';
+        if (themeBtn) {
+          themeBtn.textContent = dark ? 'CLARO' : 'OSCURO';
+          themeBtn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+        }
+      }
+
+      let currentFont = readStoredInt('fh-ux-font-level', 0);
+      let currentDark = false;
+      try { currentDark = localStorage.getItem('fh-ux-theme') === 'dark'; } catch (e) {}
+
+      if (fontBtn) {
+        fontBtn.onclick = function() {
+          currentFont = (currentFont + 1) % fontLevels.length;
+          storeValue('fh-ux-font-level', currentFont);
+          applyFontLevel(currentFont);
+        };
+      }
+      if (themeBtn) {
+        themeBtn.onclick = function() {
+          currentDark = !document.body.classList.contains('fh-dark');
+          storeValue('fh-ux-theme', currentDark ? 'dark' : 'light');
+          applyTheme(currentDark);
+        };
+      }
+
+      applyTheme(currentDark);
+      applyFontLevel(currentFont);
+
+      if (!root.dataset.fhUxObserved) {
+        let raf = 0;
+        const observer = new MutationObserver(function() {
+          if (raf) return;
+          raf = requestAnimationFrame(function() {
+            raf = 0;
+            const level = parseInt(root.dataset.fhFontLevel || '0', 10) || 0;
+            if (level > 0) applyFontLevel(level);
+          });
+        });
+        observer.observe(root, { childList: true, subtree: true });
+        root.dataset.fhUxObserved = '1';
+      }
+    }
 
     const resourceScript = '<script>window.__resources = ' +
       JSON.stringify(resourceMap).split('</' + 'script>').join('<\\/' + 'script>') +
@@ -219,6 +395,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
       window.Babel.transformScriptTags();
     }
+    installReaderControls();
+    window.setTimeout(installReaderControls, 350);
   } catch (err) {
     setStatus('Error unpacking: ' + err.message);
     console.error('Bundle unpack error:', err);
