@@ -233,57 +233,36 @@ document.addEventListener('DOMContentLoaded', async function() {
         pointer-events: none;
       }
       #plan-root [data-fh-matrix-point] > span { pointer-events: none; }
-      .fh-gm-logo {
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        background: #8F1117;
-        color: #FFF8EC;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid rgba(242,238,225,0.72);
-        box-shadow: inset 0 0 0 1px rgba(255,248,236,0.22);
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 22px;
-        font-weight: 700;
-        line-height: 1;
-        letter-spacing: 0;
+      .fh-hgugm-logo-frame {
+        aspect-ratio: 996 / 132;
+        display: block;
+        overflow: hidden;
+        position: relative;
+      }
+      .fh-hgugm-logo {
+        display: block;
+        height: auto;
+        left: -3.7149%;
+        max-width: none;
+        position: absolute;
+        top: -64.3939%;
+        width: 108.4337%;
       }
       #fh-gm-side {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        display: block;
         margin-bottom: 24px;
         padding-bottom: 18px;
         border-bottom: 1px solid #CFC9B8;
       }
-      #fh-gm-side div:last-child {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        min-width: 0;
-      }
-      #fh-gm-side strong {
-        color: #1A1A1A;
-        font-family: Georgia, 'Times New Roman', serif;
-        font-size: 18px;
-        line-height: 1;
-      }
-      #fh-gm-side span {
-        color: #8A8579;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 8px;
-        letter-spacing: 0.14em;
-        line-height: 1.45;
-      }
+      #fh-gm-side .fh-hgugm-logo-frame { width: 100%; }
       #fh-gm-mobile {
         position: fixed;
-        top: 6px;
+        top: 12px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 86;
         display: none;
+        width: clamp(88px, 28vw, 128px);
       }
       body.fh-dark, body.fh-dark #plan-root { background: #11100E !important; color: #F6EFE4 !important; }
       body.fh-dark #plan-root main,
@@ -328,8 +307,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       body.fh-dark #fh-ux-toolbar button:hover { border-color: #FF8D94; color: #FF8D94; }
       body.fh-dark #fh-ux-toolbar button[aria-pressed="true"] { background: #F6EFE4; border-color: #F6EFE4; color: #11100E; }
       body.fh-dark #fh-gm-side { border-color: #3B352D; }
-      body.fh-dark #fh-gm-side strong { color: #F6EFE4; }
-      body.fh-dark #fh-gm-side span { color: #BDB5A6; }
       @media (max-width: 1080px) {
         html, body, #plan-root { width: 100% !important; max-width: 100% !important; overflow-x: hidden !important; }
         #plan-root, #plan-root * { box-sizing: border-box !important; }
@@ -353,7 +330,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       @media (max-width: 700px) {
         #fh-gm-side { display: none !important; }
         #fh-gm-mobile { display: block !important; }
-        #fh-gm-mobile .fh-gm-logo { width: 30px !important; height: 30px !important; border-radius: 9px !important; font-size: 15px !important; }
         #plan-root section > div, #plan-root footer > div { padding-top: 56px !important; padding-bottom: 56px !important; }
         #plan-root #sec-inicio > div { padding-top: 34px !important; padding-bottom: 44px !important; }
         #plan-root #sec-inicio > div > div:first-child, #plan-root #sec-inicio [style*="display:grid"], #plan-root #sec-inicio [style*="display: grid"] { display: block !important; }
@@ -373,8 +349,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         #plan-root h2 { font-size: clamp(28px, 8vw, 36px) !important; }
         #plan-root [style*="padding:16px 22px"], #plan-root [style*="padding: 16px 22px"] { padding: 16px !important; }
       }
+      @media (max-width: 360px) {
+        #fh-gm-mobile { left: calc(50% - 8px) !important; top: 14px !important; width: 74px !important; }
+      }
       @media (min-width: 701px) and (max-width: 1080px) {
-        #fh-gm-side, #fh-gm-mobile { display: none !important; }
+        #fh-gm-side { display: none !important; }
+        #fh-gm-mobile { display: block !important; left: 20px !important; top: 10px !important; transform: none !important; width: 164px !important; }
         #plan-root #sec-inicio > div > div:first-child { grid-template-columns: minmax(0, 1fr) minmax(220px, 280px) !important; gap: 32px !important; align-items: center !important; }
         #plan-root [style*="grid-template-columns:repeat(3,1fr)"], #plan-root [style*="grid-template-columns: repeat(3, 1fr)"], #plan-root [style*="grid-template-columns:repeat(4,1fr)"], #plan-root [style*="grid-template-columns: repeat(4, 1fr)"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
         #plan-root #sec-inicio a[href$=".pdf"] { position: fixed !important; top: 8px !important; right: 18px !important; z-index: 80 !important; padding: 6px 12px !important; box-shadow: 0 6px 16px rgba(143, 17, 23, 0.18) !important; }
@@ -383,7 +363,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         #plan-root > div:first-child { justify-content: flex-start !important; padding-left: 20px !important; padding-right: 150px !important; }
         #plan-root > div:first-child > div { display: none !important; }
         #plan-root > div:first-child > #progressbar { display: block !important; }
-        #plan-root > div:first-child > div:nth-child(2) { display: block !important; max-width: calc(100vw - 190px) !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+        #plan-root > div:first-child > div:nth-child(2) { display: none !important; }
       }
       @media (min-width: 701px) and (max-width: 900px) {
         #plan-root h1, #plan-root [style*="font-size:64px"], #plan-root [style*="font-size: 64px"] { font-size: clamp(48px, 7vw, 54px) !important; }
@@ -422,18 +402,20 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (!side) {
         side = document.createElement('aside');
         side.id = 'fh-gm-side';
-        side.setAttribute('aria-label', 'Gregorio Marañón');
         side.innerHTML =
-          '<span class="fh-gm-logo" aria-hidden="true">GM</span>' +
-          '<div><strong>GM</strong><span>GREGORIO MARAÑÓN<br>FARMACIA HGUGM</span></div>';
+          '<span class="fh-hgugm-logo-frame">' +
+          '<img class="fh-hgugm-logo" src="./logo-hgugm.png" alt="Hospital General Universitario Gregorio Marañón">' +
+          '</span>';
       }
 
       let mobile = document.getElementById('fh-gm-mobile');
       if (!mobile) {
         mobile = document.createElement('div');
         mobile.id = 'fh-gm-mobile';
-        mobile.setAttribute('aria-label', 'Gregorio Marañón');
-        mobile.innerHTML = '<span class="fh-gm-logo" aria-hidden="true">GM</span>';
+        mobile.innerHTML =
+          '<span class="fh-hgugm-logo-frame">' +
+          '<img class="fh-hgugm-logo" src="./logo-hgugm.png" alt="Hospital General Universitario Gregorio Marañón">' +
+          '</span>';
         document.body.appendChild(mobile);
       }
 
