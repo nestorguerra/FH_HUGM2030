@@ -219,6 +219,20 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       #fh-ux-toolbar button:hover { border-color: #8F1117; color: #8F1117; }
       #fh-ux-toolbar button[aria-pressed="true"] { background: #1A1A1A; border-color: #1A1A1A; color: #F2EEE1; }
+      #plan-root [data-fh-matrix-point] {
+        flex-wrap: nowrap !important;
+        touch-action: manipulation;
+      }
+      #plan-root [data-fh-matrix-point]:focus-visible {
+        outline: 2px solid #8F1117;
+        outline-offset: 4px;
+      }
+      #plan-root [data-fh-matrix-dot] {
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        pointer-events: none;
+      }
+      #plan-root [data-fh-matrix-point] > span { pointer-events: none; }
       .fh-gm-logo {
         width: 44px;
         height: 44px;
@@ -381,6 +395,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     </style>`;
     template = template.replace(/<\/head>/i, responsivePatch + '</head>');
 
+    // The exported component runtime drops declarations that interpolate
+    // values inside a style attribute. Mark the matrix nodes before the
+    // template is parsed so their position, colour and size can be restored
+    // after React renders them.
+    const matrixPointNeedle = '<div onclick="{{p.select}}"';
+    const matrixDotNeedle = '<div style="width:{{p.size}}px;';
+    if (!template.includes(matrixPointNeedle) || !template.includes(matrixDotNeedle)) {
+      console.warn('[matrix] Expected point markup was not found in the bundle');
+    }
+    template = template
+      .replace(
+        matrixPointNeedle,
+        '<div data-fh-matrix-point="true" data-fh-matrix-label="{{p.label}}" data-fh-matrix-x="{{p.x}}" data-fh-matrix-y="{{p.y}}" data-fh-matrix-size="{{p.size}}" data-fh-matrix-fill="{{p.fill}}" data-fh-matrix-ring="{{p.ring}}" onclick="{{p.select}}"'
+      )
+      .replace(matrixDotNeedle, '<div data-fh-matrix-dot="true" style="width:{{p.size}}px;');
+
     function installBrandMark() {
       const root = document.getElementById('plan-root');
       if (!root) {
@@ -524,6 +554,106 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
 
+    function installMatrixChart() {
+      const root = document.getElementById('plan-root');
+      if (!root) {
+        window.setTimeout(installMatrixChart, 120);
+        return;
+      }
+      // Before the custom runtime mounts, the raw template contains a single
+      // matrix point inside <sc-for>. Wait for the 20 rendered points so we
+      // do not accidentally stamp the first case onto every clone.
+      if (root.querySelectorAll('[data-fh-matrix-point]').length < 20) {
+        window.setTimeout(installMatrixChart, 120);
+        return;
+      }
+      if (root.dataset.fhMatrixInstalled === '1') return;
+      root.dataset.fhMatrixInstalled = '1';
+
+      const riskByColour = {
+        '#1D6B3F': 'bajo',
+        '#B07D10': 'medio',
+        '#8F1117': 'alto'
+      };
+      let styleTimer = 0;
+
+      function applyMatrixStyles() {
+        const points = Array.from(root.querySelectorAll('[data-fh-matrix-point]'));
+        points.forEach(function(point) {
+          const dot = point.querySelector('[data-fh-matrix-dot]');
+          const labelNode = point.querySelector('span');
+          const label = point.dataset.fhMatrixLabel ||
+            (labelNode ? labelNode.textContent.trim() : '');
+          const x = parseFloat(point.dataset.fhMatrixX || '');
+          const y = parseFloat(point.dataset.fhMatrixY || '');
+          const size = parseFloat(point.dataset.fhMatrixSize || '11');
+          const fill = point.dataset.fhMatrixFill || '#8A8579';
+          const ring = point.dataset.fhMatrixRing ||
+            '1.5px solid rgba(26,26,26,0.25)';
+          const risk = riskByColour[fill.toUpperCase()] || 'sin clasificar';
+          const selected = size > 11;
+          if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+
+          point.style.left = x + '%';
+          point.style.bottom = y + '%';
+          point.style.top = 'auto';
+          point.style.flexWrap = 'nowrap';
+          point.setAttribute('role', 'button');
+          point.setAttribute('tabindex', '0');
+          point.setAttribute('aria-pressed', selected ? 'true' : 'false');
+          point.setAttribute(
+            'aria-label',
+            label + '. Impacto ' + y + ', viabilidad ' + x +
+              ', riesgo ' + risk + '. Pulse para ver el caso.'
+          );
+          point.title =
+            label + ' · impacto ' + y + ' · viabilidad ' + x +
+            ' · riesgo ' + risk;
+
+          if (dot) {
+            dot.style.width = size + 'px';
+            dot.style.height = size + 'px';
+            dot.style.background = fill;
+            dot.style.border = ring;
+          }
+        });
+      }
+
+      function scheduleMatrixStyles() {
+        if (styleTimer) return;
+        styleTimer = window.setTimeout(function() {
+          styleTimer = 0;
+          applyMatrixStyles();
+        }, 0);
+      }
+
+      root.addEventListener('keydown', function(event) {
+        const point = event.target.closest('[data-fh-matrix-point]');
+        if (!point || (event.key !== 'Enter' && event.key !== ' ')) return;
+        event.preventDefault();
+        point.click();
+      });
+
+      const observer = new MutationObserver(scheduleMatrixStyles);
+      observer.observe(root, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: [
+          'data-fh-matrix-label',
+          'data-fh-matrix-x',
+          'data-fh-matrix-y',
+          'data-fh-matrix-size',
+          'data-fh-matrix-fill',
+          'data-fh-matrix-ring'
+        ]
+      });
+      applyMatrixStyles();
+      window.setTimeout(applyMatrixStyles, 120);
+      window.setTimeout(applyMatrixStyles, 350);
+      window.setTimeout(applyMatrixStyles, 1000);
+    }
+
     const resourceScript = '<script>window.__resources = ' +
       JSON.stringify(resourceMap).split('</' + 'script>').join('<\\/' + 'script>') +
       ';</' + 'script>';
@@ -571,8 +701,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     installHeadMetadata();
     installBrandMark();
     installReaderControls();
+    installMatrixChart();
     window.setTimeout(installBrandMark, 350);
     window.setTimeout(installReaderControls, 350);
+    window.setTimeout(installMatrixChart, 350);
   } catch (err) {
     setStatus('Error unpacking: ' + err.message);
     console.error('Bundle unpack error:', err);
