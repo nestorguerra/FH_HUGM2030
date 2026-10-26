@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#8f1117">
+  <meta name="description" content="Gestor editable del cronograma del Plan IA de Farmacia HGUGM. Fechas, responsables, tareas e hitos con guardado local.">
+  <title>Gestor Gantt · Farmacia HGUGM</title>
+  <link rel="icon" href="../gm-icon.png">
+  <link rel="stylesheet" href="./styles.css?v=gantt-1">
+  <script type="module" src="./app.mjs?v=gantt-1"></script>
+</head>
+<body>
+  <div id="loading" class="loading" role="status">Preparando su planificación…</div>
+  <div id="application" class="application" hidden>
+    <header class="app-header">
+      <a href="../#sec-ruta" class="brand" title="Volver al informe"><img src="../logo-hgugm.png" alt="Hospital General Universitario Gregorio Marañón"></a>
+      <div class="heading"><p class="eyebrow">Plan IA · Farmacia Hospitalaria</p><h1>Gestor de la hoja de ruta</h1></div>
+      <div class="save-block"><span class="private-label">MI PLANIFICACIÓN</span><span id="saveStatus" role="status">Guardado local</span></div>
+      <button id="helpButton" class="icon-button" aria-label="Ayuda del gestor" title="Ayuda">?</button>
+    </header>
+
+    <div class="toolbar" aria-label="Controles del cronograma">
+      <button id="newButton" class="primary">＋ Añadir tarea o hito</button>
+      <div class="button-group"><button id="undoButton" aria-label="Deshacer" title="Deshacer · Ctrl/⌘ Z">↶</button><button id="redoButton" aria-label="Rehacer" title="Rehacer · Ctrl/⌘ Mayús Z">↷</button></div>
+      <span class="toolbar-divider"></span>
+      <div class="button-group"><button id="panLeft" aria-label="Desplazar el calendario a la izquierda">←</button><button id="todayButton">Hoy</button><button id="panRight" aria-label="Desplazar el calendario a la derecha">→</button></div>
+      <div class="button-group"><button id="zoomOut" aria-label="Alejar el diagrama">−</button><button id="zoomIn" aria-label="Acercar el diagrama">＋</button></div>
+      <label class="sr-only" for="scaleSelect">Escala de tiempo</label><select id="scaleSelect"><option value="32">Días</option><option value="9">Semanas</option><option value="2.8">Meses</option><option value="0.9">Trimestres</option></select>
+      <button id="fitButton">Ver todo</button>
+      <div class="toolbar-spacer"></div>
+      <details class="export-menu"><summary>Copias y exportación ▾</summary><div>
+        <button id="exportButton">Descargar copia JSON</button><button id="csvButton">Exportar tabla CSV</button><button id="importButton">Importar una copia</button>
+      </div></details>
+      <input id="importFile" type="file" accept=".json,application/json" hidden>
+    </div>
+
+    <div class="filters">
+      <label class="search"><span class="sr-only">Buscar tareas, notas o responsables</span><input id="searchInput" type="search" placeholder="Buscar tareas, notas o responsables…" autocomplete="off"></label>
+      <label><span class="sr-only">Filtrar por responsable</span><select id="ownerFilter"><option value="">Todos los responsables</option></select></label>
+      <label><span class="sr-only">Filtrar por estado</span><select id="statusFilter"><option value="">Todos los estados</option><option value="planificado">Planificado</option><option value="curso">En curso</option><option value="completado">Completado</option><option value="bloqueado">Bloqueado</option></select></label>
+      <button id="clearFilters">Limpiar filtros</button>
+      <div class="toolbar-spacer"></div><button id="expandButton">Desplegar todo</button><button id="collapseButton">Contraer todo</button>
+    </div>
+    <aside id="storageWarning" class="notice warning" hidden><span id="storageWarningText"></span><button id="recoverRaw">Descargar copia guardada</button><button id="acceptBase">Usar y guardar este plan</button></aside>
+    <aside id="remoteNotice" class="notice warning" hidden><span>Otra pestaña ha guardado una versión diferente.</span><button id="loadRemote">Cargar sus cambios</button><button id="keepCurrent">Conservar esta versión</button></aside>
+    <div class="board-meta"><span id="rowCount"></span><button id="conflictButton" class="conflict-button" hidden></button><span class="hint">Arrastre barras para mover fechas · extremos para cambiar duración · clic para editar</span></div>
+
+    <main id="timelineViewport" class="timeline-viewport" tabindex="0" aria-label="Cronograma editable. Desplácese horizontalmente; pulse una barra para editarla.">
+      <div id="surface" class="surface">
+        <div class="calendar-header"><div class="corner"><span>Iniciativa / fase</span><small>Responsables · progreso</small></div><div id="timeAxis" class="time-axis"></div></div>
+        <div id="rows"></div><svg id="dependenciesSvg" class="dependencies" aria-hidden="true"></svg><div id="todayLine" class="today-line" aria-hidden="true"></div>
+      </div>
+      <div id="emptyState" class="empty-state" hidden><h2>No hay elementos que mostrar</h2><p>Pruebe otro filtro o añada una tarea o un hito.</p></div>
+    </main>
+    <footer class="app-footer"><div class="legend" aria-label="Leyenda de fases"><span><i style="background:#aaa38f"></i>Construcción / POC</span><span><i style="background:#b07d10"></i>Piloto</span><span><i style="background:#1d6b3f"></i>Producción</span><span><i style="background:#8f1117"></i>Ventana crítica</span><span>◆ Hito</span></div><span>Guardado sólo en este navegador · Exporte una copia para trasladarlo</span></footer>
+  </div>
+
+  <dialog id="editorDialog" class="editor-dialog" aria-labelledby="editorHeading">
+    <form id="taskForm">
+      <div class="dialog-header"><div><p class="eyebrow">Ficha del cronograma</p><h2 id="editorHeading">Nuevo elemento</h2></div><button type="button" id="closeEditor" class="icon-button" aria-label="Cerrar ficha">×</button></div>
+      <div class="dialog-body">
+        <div id="formError" class="form-error" role="alert" hidden></div>
+        <label>Título<input id="taskTitle" name="title" required maxlength="300" autocomplete="off"></label>
+        <div class="form-grid"><label>Tipo<select id="taskType"><option value="task">Tarea / fase</option><option value="milestone">Hito</option><option value="group">Proyecto con fases</option></select></label><label>Proyecto<select id="taskParent"><option value="">Sin proyecto padre</option></select></label></div>
+        <div class="form-grid"><label>Inicio<input id="taskStart" type="date" min="1900-01-01" max="2200-12-31" required></label><label>Fin<input id="taskEnd" type="date" min="1900-01-01" max="2200-12-31" required></label></div>
+        <p id="summaryHint" class="field-hint" hidden>Las fechas y el progreso se calculan a partir de las fases. Arrastre la barra del proyecto para moverlas todas; edite cada fase para cambiar su duración.</p>
+        <label>Responsables<input id="taskOwners" placeholder="Nombres separados por comas" autocomplete="off"><small>Puede asignar varias personas. Las fases sin asignación heredan las del proyecto.</small></label>
+        <div class="form-grid"><label>Estado<select id="taskStatus"><option value="planificado">Planificado</option><option value="curso">En curso</option><option value="completado">Completado</option><option value="bloqueado">Bloqueado</option></select></label><label>Progreso (%)<input id="taskProgress" type="number" min="0" max="100" step="1" required></label></div>
+        <label>Fase del plan<select id="taskPhase"><option value="construccion">Construcción / POC</option><option value="piloto">Piloto / sombra / medición</option><option value="produccion">Producción</option><option value="critica">Ventana crítica</option><option value="entrega">Entrega / publicación</option></select></label>
+        <label>Notas e información adicional<textarea id="taskNotes" rows="4" maxlength="20000" placeholder="Objetivo, entregables, criterios de cierre, próximos pasos…"></textarea></label>
+        <fieldset id="dependenciesField"><legend>Depende de</legend><p class="field-hint">Relación fin → inicio. Si las fechas se solapan, el gestor lo señalará para que pueda revisarlas.</p><div id="dependenciesList" class="dependencies-list"></div></fieldset>
+      </div>
+      <div class="dialog-actions"><button type="button" id="deleteButton" class="danger quiet">Eliminar</button><span class="toolbar-spacer"></span><button type="button" id="cancelEditor">Cancelar</button><button type="submit" class="primary">Guardar cambios</button></div>
+    </form>
+  </dialog>
+  <dialog id="confirmDialog" class="confirm-dialog" aria-labelledby="confirmTitle"><h2 id="confirmTitle">Confirmar</h2><p id="confirmText"></p><div class="dialog-actions"><button id="confirmCancel">Cancelar</button><button id="confirmAccept" class="primary">Continuar</button></div></dialog>
+  <dialog id="helpDialog" class="help-dialog" aria-labelledby="helpHeading"><div class="dialog-header"><h2 id="helpHeading">Su hoja de ruta, editable</h2><button id="closeHelp" class="icon-button" aria-label="Cerrar ayuda">×</button></div><div class="dialog-body">
+    <p>El punto de partida conserva el calendario base del informe V1.1: 11 filas y 23 fases. Las fechas se expresaban por trimestre; ahora puede afinarlas. Los responsables están sin asignar y el color de una fase no acredita ejecución.</p>
+    <ul><li>Pulse <strong>＋</strong> junto a una iniciativa para desplegar sus fases.</li><li>Pulse una fila o barra para editar fechas, responsables, notas y dependencias.</li><li>Arrastre una barra para moverla, o sus extremos para cambiar la duración. Un proyecto mueve también todas sus fases.</li><li>Arrastre el fondo del calendario, use las flechas o el desplazamiento de su ratón para recorrerlo. Los botones de zoom conservan el centro de la vista.</li><li>Haga doble clic en un espacio vacío del calendario para crear una tarea en esa fecha.</li><li>Con una barra enfocada, las flechas la mueven un día; Mayús mueve siete y Alt cambia el final. Enter abre su ficha.</li><li><strong>Ctrl/⌘ Z</strong> deshace; <strong>Ctrl/⌘ Mayús Z</strong> rehace.</li></ul>
+    <p><strong>Sus cambios se guardan en este navegador.</strong> No se envían al hospital ni se sincronizan entre equipos. Descargue una copia JSON para recuperarlos o trasladarlos. El CSV sirve para abrir la tabla en una hoja de cálculo.</p>
+  </div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div><div id="dragTooltip" class="drag-tooltip" hidden></div>
+</body>
+</html>
