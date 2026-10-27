@@ -264,6 +264,32 @@ document.addEventListener('DOMContentLoaded', async function() {
         display: none;
         width: clamp(88px, 28vw, 128px);
       }
+      #plan-root #sec-inicio [data-reveal="hero-emblem"] {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+      }
+      #plan-root #sec-inicio .fh-plan-video { width: 100%; margin: 0 0 12px; }
+      #plan-root #sec-inicio .fh-plan-video figcaption {
+        margin-bottom: 10px;
+        color: #8F1117;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        line-height: 1.4;
+        text-transform: uppercase;
+      }
+      #plan-root #sec-inicio .fh-plan-video video {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 1px solid #CFC9B8;
+        border-radius: 8px;
+        background: #1A1A1A;
+      }
+      body.fh-dark #plan-root #sec-inicio .fh-plan-video figcaption { color: #FF8D94; }
       body.fh-dark, body.fh-dark #plan-root { background: #11100E !important; color: #F6EFE4 !important; }
       body.fh-dark #plan-root main,
       body.fh-dark #plan-root nav,
@@ -333,7 +359,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         #plan-root section > div, #plan-root footer > div { padding-top: 56px !important; padding-bottom: 56px !important; }
         #plan-root #sec-inicio > div { padding-top: 34px !important; padding-bottom: 44px !important; }
         #plan-root #sec-inicio > div > div:first-child, #plan-root #sec-inicio [style*="display:grid"], #plan-root #sec-inicio [style*="display: grid"] { display: block !important; }
-        #plan-root #sec-inicio [data-reveal="hero-emblem"] { display: none !important; }
+        #plan-root #sec-inicio [data-reveal="hero-emblem"] { display: flex !important; margin-top: 30px; }
+        #plan-root #sec-inicio [data-reveal="hero-emblem"] > svg { display: none !important; }
+        #plan-root #sec-inicio .fh-plan-video { max-width: 560px; margin-bottom: 0; }
         #plan-root #sec-inicio [style*="letter-spacing:0.24em"], #plan-root #sec-inicio [style*="letter-spacing: 0.24em"] { letter-spacing: 0.12em !important; line-height: 1.55 !important; }
         #plan-root #sec-inicio p { max-width: 100% !important; font-size: 17px !important; }
         #plan-root #sec-inicio [style*="margin-top:42px"], #plan-root #sec-inicio [style*="margin-top: 42px"] { margin-top: 28px !important; }
@@ -374,6 +402,19 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     </style>`;
     template = template.replace(/<\/head>/i, responsivePatch + '</head>');
+
+    // Place the approved presentation above the existing cover emblem.
+    const heroEmblem = '<div data-reveal="hero-emblem" style="justify-self:center;">';
+    if (template.includes(heroEmblem)) {
+      template = template.replace(heroEmblem, heroEmblem +
+        '<figure class="fh-plan-video">' +
+        '<figcaption>Presentación del plan · 5:41</figcaption>' +
+        '<video controls="true" playsinline preload="metadata" src="./presentacion-plan.mp4#t=0.1" aria-label="Vídeo de presentación del plan de inteligencia artificial para Farmacia Hospitalaria">' +
+        'Su navegador no admite el vídeo. <a href="./presentacion-plan.mp4">Descargar vídeo</a>.' +
+        '</video></figure>');
+    } else {
+      console.warn('[video] Cover emblem was not found in the bundle');
+    }
 
     // The exported component runtime drops declarations that interpolate
     // values inside a style attribute. Mark the matrix nodes before the
